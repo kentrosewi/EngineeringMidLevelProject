@@ -1,12 +1,8 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-#import db_config
+
 import db_config
 
-# app = Flask(__name__)
-# app.config['SQLALCHEMY_DATABASE_URI'] = db_config.db_uri
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-# db = SQLAlchemy(app)
 db = db_config.db
 
 class Client(db.Model):
