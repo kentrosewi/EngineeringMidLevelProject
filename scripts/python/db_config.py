@@ -1,1 +1,0 @@
-db_uri = 'mysql://mrbritecore:britecore2018@localhost/britecore'
