@@ -25,7 +25,10 @@ def get_feature_request():
 	priority_param = request.args.get("priority")
 	
 	feature_requests = db_manager.get_feature_request(feature_request_id_param, client_id_param, product_area_id_param, priority_param)
-	return json.dumps(utility.dict_list(feature_requests), default = utility.convert)
+	# return json.dumps(utility.dict_list(feature_requests), default = utility.convert)
+	return "callback(" + json.dumps(utility.dict_list(feature_requests), default = utility.convert) + ")"
+		
+		
 
 @app.route("/feature-request/POST", methods=['GET'])
 #@app.route("/feature-request/POST/", methods=['POST'])
