@@ -5,8 +5,6 @@ import utility
 
 class UtilityTestMethods(unittest.TestCase):
 
-		#TODO add unit tests for utility.as_dict(self) and utility.dict_list(self) via flask-testing extension
-
 		def test_convert_is_none(self):
 			non_date = "I am not a date."
 			self.assertIsNone(utility.convert(non_date))
@@ -21,5 +19,3 @@ class UtilityTestMethods(unittest.TestCase):
 				str(current_date.month).zfill(2) + '-' + 
 				str(current_date.day).zfill(2))
 			
-if __name__ == '__main__':
-	unittest.main()
