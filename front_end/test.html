@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Feature Request</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	<script type='text/javascript' src='http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.2.js'></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+</head>
+<body> 
+<h1>Feature Request</h1>
+<div class="container"> 
+	<form data-bind="submit: selectClient">
+		<input type="number" data-bind="value: clientSelected" class="form-control" placeholder="client id">
+		<button type="submit" class="btn btn-success">Go</button>
+	</form>
+  
+	<div class="card-deck mb-3 text-center">
+		<form data-bind="submit: addNewFeatureRequest">
+			<div class="card mb-4 box-shadow">
+				<div class="card-header">
+					<h4 class="my-0 font-weight-normal">
+						<input type="text" data-bind="value: newTitle" class="form-control" placeholder="title">
+					</h4>
+				</div>
+				<div class="card-body">
+					<input type="text" data-bind="value: newDescription" class="form-control" placeholder="description">
+
+					<button type="submit" class="btn btn-success">Submit</button>				
+				</div>
+			</div>
+		</form>
+	
+		<ul data-bind="foreach: featureRequests" style="list-style-type: none;">
+			<li>
+				<div class="card mb-4 box-shadow">
+					<div class="card-header">
+						<h4 class="my-0 font-weight-normal"><span data-bind='text: title'></span></h4>
+					</div>
+					<div class="card-body">
+						<p>Description: <span data-bind='text: description'></span>
+						<p>Client: <span data-bind='text: clientId'></span>
+						<p>Priority: <span data-bind='text: priority'></span>
+						<p>Target: <span data-bind='text: target'></span>
+						<p>Product Area: <span data-bind='text: productAreaId'></span>
+						<!-- <div> -->
+							<!-- <button type="button" class="btn btn-outline-warning">Edit</button> -->
+							<!-- <button type="button" class="btn btn-outline-danger">Delete</button>						 -->
+						<!-- </div> -->					
+					</div>
+				</div>		
+			</li>
+		</ul>
+	</div>
+</div>
+
+</body>
+</html>
+<script type='text/javascript'>
+	var FeatureRequestViewModel = function() {
+		var self = this;
+		
+		self.newTitle = ko.observable();
+		self.newDescription = ko.observable();
+				
+		self.clientSelected = ko.observable();		
+				
+		self.featureRequests = ko.observableArray([]);
+		
+		self.addFeatureRequest = function(data) {
+			self.featureRequests.push(new FeatureRequest(data));
+		};
+		
+		self.addNewFeatureRequest = function() {
+			console.log("adding new");
+		};
+		
+		self.selectClient = function() {
+			console.log("selectClient " + this.clientSelected());
+			self.getClientFeatureRequests(this.clientSelected());
+		};
+		
+		self.getClientFeatureRequests = function(clientId) {
+			self.featureRequests.removeAll();
+			urlString = "http://localhost:5000/feature-request/GET?clientId=" + clientId;
+			$.ajax({
+				type: "GET",
+				contentType: "application/json; charset=utf-8",
+				dataType: "jsonp",
+				url: urlString,
+				crossDomain: true,
+				jsonpCallback: "callback",
+				success: function(data) {
+					console.log("success " + data);
+					$.each(data, function(k, v) {
+						self.addFeatureRequest(v);
+					});
+				},
+				error: function(data) {
+					console.log("error " + JSON.stringify(data));
+				}
+			});			
+		};
+		
+	};
+
+	function FeatureRequest(data) {
+		this.id = ko.observable(data.id);
+		this.title = ko.observable(data.title);
+		this.description = ko.observable(data.description);
+		this.clientId = ko.observable(data.client_id);
+		this.priority = ko.observable(data.priority);
+		this.target = ko.observable(data.target);
+		this.productAreaId = ko.observable(data.product_area_id);
+	};
+
+	ko.applyBindings(new FeatureRequestViewModel());
+</script>
