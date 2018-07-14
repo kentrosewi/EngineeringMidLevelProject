@@ -28,7 +28,11 @@ def get_feature_request():
 	# return json.dumps(utility.dict_list(feature_requests), default = utility.convert)
 	return request.args.get("callback") + "(" + json.dumps(utility.dict_list(feature_requests), default = utility.convert) + ")"
 		
-		
+@app.route("/feature-request/DELETE", methods=['GET'])
+def delete_feature_request():
+	feature_request_id_param = request.args.get("id")	
+	db_manager.delete_feature_request(feature_request_id_param)
+	return request.args.get("callback") + "(true)"
 
 @app.route("/feature-request/POST", methods=['GET'])
 #@app.route("/feature-request/POST/", methods=['POST'])
@@ -42,5 +46,7 @@ def post_feature_request():
 
 	db_manager.post_feature_request(title_param, description_param, client_id_param, priority_param, target_param, product_area_id_param)
 
+	return request.args.get("callback") + "(true)"
+	
 if (__name__ == "__main__"):
 	app.run(host='0.0.0.0')

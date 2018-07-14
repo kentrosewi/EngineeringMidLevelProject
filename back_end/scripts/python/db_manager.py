@@ -35,7 +35,7 @@ def get_feature_request(id_param, client_id_param, product_area_id_param, priori
 	if priority_param:
 		where['priority'] = priority_param
 	
-	return FeatureRequest.query.filter_by(**where)
+	return FeatureRequest.query.filter_by(**where).order_by(FeatureRequest.priority.asc())
 	
 def post_feature_request(title_param, description_param, client_id_param, priority_param, target_param, product_area_id_param):
 	if has_same_priority_feature_request(client_id_param, priority_param):
@@ -44,6 +44,13 @@ def post_feature_request(title_param, description_param, client_id_param, priori
 	new_feature_request = FeatureRequest(0, title_param, description_param, client_id_param, priority_param, target_param, product_area_id_param)
 	db.session.add(new_feature_request)
 	db.session.commit()
+	
+def delete_feature_request(feature_request_id_param):
+	if feature_request_id_param:
+		feature_requests = get_feature_request(feature_request_id_param, '', '', '')
+		if feature_requests.count() == 1:
+			db.session.delete(feature_requests[0])
+			db.session.commit()
 		
 def has_same_priority_feature_request(client_id_param, priority_param):
 	feature_requests = get_feature_request('', client_id_param, '', priority_param)
