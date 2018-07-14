@@ -1,0 +1,18 @@
+<div class="card mb-4 box-shadow">
+	<div class="card-header">
+		<h4 class="my-0 font-weight-normal"><span data-bind='text: title'></span></h4>
+	</div>
+	<div class="card-body">
+		<div>
+			<p>Description: <span data-bind='text: description'></span>
+			<p>Priority: <span data-bind='text: priority'></span>
+			<p>Target: <span data-bind='text: target'></span>
+			<p>Product Area: <span data-bind='text: $parent.getProductAreaName(productAreaId())'></span>
+			<div> 
+				<!-- <button type="button" class="btn btn-outline-warning">Edit</button> -->
+				<button type="button" data-bind="click: $parent.deleteFeatureRequest" class="btn btn-outline-danger">Delete</button>	
+			</div>							
+		</div>
+		<!-- <button type="button" data-toggle="collapse" data-target="#demo" class="btn btn-outline-info">More/Less</button> -->
+	</div>
+</div>	

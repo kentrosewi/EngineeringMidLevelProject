@@ -4,8 +4,11 @@
 	<title>Feature Request</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-	<script data-main="config" src="require.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js"></script>
+	<script type='text/javascript' src='http://ajax.aspnetcdn.com/ajax/knockout/knockout-3.4.2.js'></script>
 </head>
 <body> 
 <div class="alert alert-success" id="success-alert">
@@ -59,7 +62,52 @@
 					</div>					
 				</div>
 				<div id="submitBlock" class="collapse">
-					<new-feature-request-component params=""></new-feature-request-component>
+					<div class="card-block">
+						<div class="row">
+							<div class="offset-md-1 col-md-10">
+								<form id="submitForm" data-bind="submit: submitNewFeatureRequest">
+									<div class="form-group ml-2 mr-2 mt-2">
+										<label for="clientInput">Client</label>
+										<select required id="clientInput" class="form-control" data-bind="options: clients,
+																							optionsText: 'name',
+																							optionsValue: 'id',
+																							value: newClientId,
+																							optionsCaption: 'Select a Client'">
+										</select>
+									</div>									
+									<div class="form-group ml-2 mr-2">
+										<label for="productAreaInput">Product Area</label>
+										<select required id="productAreaInput" class="form-control" data-bind="options: productAreas,
+																							optionsText: 'name',
+																							optionsValue: 'id',
+																							value: newProductAreaId,
+																							optionsCaption: 'Select a Product Area'">
+										</select>
+									</div>
+									<div class="form-group ml-2 mr-2">
+										<label for="titleInput">Title</label>
+										<input required type="text" maxlength="25" class="form-control" id="titleInput" data-bind="value: newTitle" placeholder="Enter title">
+									</div>
+									<div class="form-group ml-2 mr-2">
+										<label for="descriptionInput">Description</label>
+										<textarea required maxlength="100" class="form-control" id="descriptionInput" rows="3" data-bind="value: newDescription"></textarea>
+									</div>									
+									<div class="form-group ml-2 mr-2">
+										<label for="targetDateInput">Target Date</label>
+										<input required type="date" class="form-control" id="targetDateInput" data-bind="value: newTargetDate">									
+									</div>
+									<div class="form-group ml-2 mr-2">
+										<label for="priorityInput">Priority</label>
+										<input required type="number" min="0" class="form-control" id="priorityInput" data-bind="value: newPriority" placeholder="0 for highest">									
+									</div>
+									<div class="form-group ml-2 mr-2">
+										<button type="submit" class="btn btn-success">Submit</button>							
+									</div>									
+								</form>
+							</div>
+						</div>
+
+					</div>
 				</div>
 			</div>
 		</div>
@@ -80,11 +128,11 @@
 								<p>Target: <span data-bind='text: target'></span>
 								<p>Product Area: <span data-bind='text: $parent.getProductAreaName(productAreaId())'></span>
 								<div> 
-									<button type="button" class="btn btn-outline-warning">Edit</button>
+									<!-- <button type="button" class="btn btn-outline-warning">Edit</button> -->
 									<button type="button" data-bind="click: $parent.deleteFeatureRequest" class="btn btn-outline-danger">Delete</button>	
 								</div>							
 							</div>
-							<button type="button" data-toggle="collapse" data-target="#demo" class="btn btn-outline-info">More/Less</button>
+							<!-- <button type="button" data-toggle="collapse" data-target="#demo" class="btn btn-outline-info">More/Less</button> -->
 						</div>
 					</div>	
 				</li>
@@ -95,22 +143,16 @@
 
 </body>
 </html>
-	<script>
-		require(['config'], function() {
-			require(['knockout'], function(ko) {
-				ko.components.register('new-feature-request-component',{ 
-					require: 'components/new-feature-request/new-feature-request'
-				});		
-			});
-		});
-	</script>
-<script>
-require(['config'], function() {
-require(['knockout', 'jquery', 'bootstrap'], function(ko, $, bootstrap) {
-		
-	
+<script type='text/javascript'>
 	var FeatureRequestViewModel = function() {
 		var self = this;
+		
+		self.newTitle = ko.observable();
+		self.newDescription = ko.observable();
+		self.newClientId =ko.observable();
+		self.newProductAreaId = ko.observable();
+		self.newTargetDate = ko.observable();
+		self.newPriority = ko.observable();
 		
 		self.clientIdSelected = ko.observable();		
 		self.productAreaIdSelected = ko.observable();		
@@ -142,6 +184,20 @@ require(['knockout', 'jquery', 'bootstrap'], function(ko, $, bootstrap) {
 		self.getProductAreaName = function(id) {
 			return self.productAreasMap.get(id);
 		}
+		
+		self.submitNewFeatureRequest = function() {
+			newFeatureRequestModel = {
+				"id": 0,
+				"title": self.newTitle(),
+				"description": self.newDescription(),
+				"client_id": self.newClientId(),
+				"priority": self.newPriority(),
+				"target": self.newTargetDate(),
+				"product_area_id": self.newProductAreaId()
+			}			
+			
+			self.submitNewFeatureRequestService(newFeatureRequestModel);
+		};
 		
 		self.deleteFeatureRequest = function() {
 			self.deleteFeatureRequestService(this);
@@ -178,6 +234,55 @@ require(['knockout', 'jquery', 'bootstrap'], function(ko, $, bootstrap) {
 					$.each(data, function(k, v) {
 						self.addFeatureRequest(v);
 					});
+				},
+				error: function(data) {
+					alertError();
+				}
+			});			
+		};
+		
+		self.submitNewFeatureRequestService = function(newFeatureRequest) {
+			urlString = "http://localhost:5000/feature-request/POST?";
+			
+			if(newFeatureRequest.title) {
+				urlString += "title=" + newFeatureRequest.title + "&";
+			}
+			
+			if(newFeatureRequest.description) {
+				urlString += "description=" + newFeatureRequest.description + "&";
+			}
+			
+			if(newFeatureRequest.target) {
+				urlString += "target=" + newFeatureRequest.target + "&";
+			}
+			
+			if(newFeatureRequest.priority) {
+				urlString += "priority=" + newFeatureRequest.priority + "&";
+			}
+			
+			if(newFeatureRequest.client_id) {
+				urlString += "clientId=" + newFeatureRequest.client_id + "&";
+			}
+			
+			if(newFeatureRequest.product_area_id) {
+				urlString += "productAreaId=" + newFeatureRequest.product_area_id;
+			}		
+			
+			$.ajax({
+				type: "GET",
+				contentType: "application/json; charset=utf-8",
+				dataType: "jsonp",
+				url: encodeURI(urlString),
+				crossDomain: true,
+				success: function(data) {
+					document.getElementById("submitForm").reset();
+					$('#submitBlock').collapse('toggle')
+					alertSuccess();
+
+					if(self.lastClientId === newFeatureRequest.client_id && 
+						(self.lastProductAreaId == null || self.lastProductAreaId === newFeatureRequest.product_area_id)) {
+						self.getClientFeatureRequestsService(self.lastClientId, self.lastProductAreaId);;
+					}	
 				},
 				error: function(data) {
 					alertError();
@@ -286,7 +391,25 @@ require(['knockout', 'jquery', 'bootstrap'], function(ko, $, bootstrap) {
 
 	ko.applyBindings(new FeatureRequestViewModel());
 	
+	function setTargetDateBounds() {
+		var today = new Date();
+		var dd = today.getDate();
+		var mm = today.getMonth() + 1; 
+		var yyyy = today.getFullYear();
+		if(dd < 10){
+			dd = '0' + dd
+		} 
+		if(mm < 10){
+			mm = '0' + mm
+		} 
 
+		today = yyyy + '-' + mm + '-' + dd;
+		document.getElementById("targetDateInput").setAttribute("min", today);
+		fiveYearsFromToday = (yyyy + 5) + '-' + mm + '-' + dd;
+		document.getElementById("targetDateInput").setAttribute("max", fiveYearsFromToday);
+	}
+	
+	setTargetDateBounds();
 	
 	$(document).ready (function(){
             $("#success-alert").hide();
@@ -304,7 +427,4 @@ require(['knockout', 'jquery', 'bootstrap'], function(ko, $, bootstrap) {
 			$("#edanger-alert").slideUp(500);
 		});  
 	}
-	
-});	
-});
 </script>
