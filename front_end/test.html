@@ -12,50 +12,120 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 </head>
 <body> 
-<h1>Feature Request</h1>
-<div class="container"> 
-	<form data-bind="submit: selectClient">
-		<input type="number" data-bind="value: clientSelected" class="form-control" placeholder="client id">
-		<button type="submit" class="btn btn-success">Go</button>
-	</form>
-  
-	<div class="card-deck mb-3 text-center">
-		<form data-bind="submit: addNewFeatureRequest">
-			<div class="card mb-4 box-shadow">
-				<div class="card-header">
-					<h4 class="my-0 font-weight-normal">
-						<input type="text" data-bind="value: newTitle" class="form-control" placeholder="title">
-					</h4>
-				</div>
-				<div class="card-body">
-					<input type="text" data-bind="value: newDescription" class="form-control" placeholder="description">
 
-					<button type="submit" class="btn btn-success">Submit</button>				
+<div class="container-fluid"> 
+	<div class="row mb-4">
+		<div class="col-md-12" style="text-align: center;">
+			<h1>Feature Request</h1>		
+		</div>
+	</div>
+	
+	<form data-bind="submit: getClientFeatureRequests" class="mb-4">
+		<div class="row">
+			<div class="col-md-5 mb-2">
+				<select required class="form-control" data-bind="options: clients,
+																	optionsText: 'name',
+																	optionsValue: 'id',
+																	value: clientIdSelected,
+																	optionsCaption: 'Select a Client'">
+				</select>
+			</div>
+			<div class="col-md-5 mb-2">
+				<select class="form-control" data-bind="options: productAreas,
+																	optionsText: 'name',
+																	optionsValue: 'id',
+																	value: productAreaIdSelected,
+																	optionsCaption: 'Select a Product Area [Optional]'">
+				</select>
+			</div>
+			<div class="col-md-2 mb-2">
+				<button type="submit" class="btn btn-success" style="width: 100%">Go</button>
+			</div>		
+		</div>
+	</form>
+
+	<div class="row mb-4">
+		<div class="col-md-6 offset-md-3">
+			<div class="card">
+				<div class="card-header">
+					<div class="row">
+						<div class="col-md-12">
+							<button type="button" style="width: 100%" class="btn btn-info" data-toggle="collapse" data-target="#test-block">Enter a new feature request</button>						
+						</div>
+					</div>					
+				</div>
+				<div id="test-block" class="collapse">
+					<div class="card-block">
+						<div class="row">
+							<div class="offset-md-1 col-md-10">
+								<form>
+									<div class="form-group">
+										<label for="titleInput">Title</label>
+										<input type="text" class="form-control" id="titleInput" placeholder="Enter title">
+									</div>
+									<div class="form-group">
+										<label for="descriptionInput">Description</label>
+										<textarea class="form-control" id="descriptionInput" rows="3"></textarea>
+									</div>
+									<div class="form-group">
+										<label for="productAreaInput">Product Area</label>
+										<select id="productAreaInput" class="form-control" data-bind="options: productAreas,
+																							optionsText: 'name',
+																							optionsValue: 'id',
+																							value: newProductAreaId,
+																							optionsCaption: 'Select a Product Area'">
+										</select>
+									</div>
+									<div class="form-group">
+										<label for="targetDateInput">Target Date</label>
+										<input type="date" class="form-control" id="targetDateInput">									
+									</div>
+									<div class="form-group">
+										<label for="priorityInput">Priority</label>
+										<input type="number" class="form-control" id="priorityInput" placeholder="0 for highest">									
+									</div>
+									<div class="form-group">
+										<button type="submit" class="btn btn-success">Submit</button>							
+									</div>									
+								</form>
+							</div>
+						</div>
+
+					</div>
 				</div>
 			</div>
-		</form>
-	
-		<ul data-bind="foreach: featureRequests" style="list-style-type: none;">
-			<li>
-				<div class="card mb-4 box-shadow">
-					<div class="card-header">
-						<h4 class="my-0 font-weight-normal"><span data-bind='text: title'></span></h4>
-					</div>
-					<div class="card-body">
-						<p>Description: <span data-bind='text: description'></span>
-						<p>Client: <span data-bind='text: clientId'></span>
-						<p>Priority: <span data-bind='text: priority'></span>
-						<p>Target: <span data-bind='text: target'></span>
-						<p>Product Area: <span data-bind='text: productAreaId'></span>
-						<!-- <div> -->
-							<!-- <button type="button" class="btn btn-outline-warning">Edit</button> -->
-							<!-- <button type="button" class="btn btn-outline-danger">Delete</button>						 -->
-						<!-- </div> -->					
-					</div>
-				</div>		
-			</li>
-		</ul>
+		</div>
 	</div>
+	<div class="row">
+		<div class="card-deck mb-3">
+			<ul data-bind="foreach: featureRequests" style="list-style-type: none;">			
+				<!-- The existing feature requests. -->
+				<li style="display: inline">					
+					<div class="card mb-4 box-shadow">
+						<div class="card-header">
+							<h4 class="my-0 font-weight-normal"><span data-bind='text: title'></span></h4>
+						</div>
+						<div class="card-body">
+							<div>
+								<p>Description: <span data-bind='text: description'></span>
+								<p>Priority: <span data-bind='text: priority'></span>
+								<p>Target: <span data-bind='text: target'></span>
+								<p>Product Area: <span data-bind='text: productAreaId'></span>
+								<!-- <div> -->
+									<!-- <button type="button" class="btn btn-outline-warning">Edit</button> -->
+									<!-- <button type="button" class="btn btn-outline-danger">Delete</button>						 -->
+								<!-- </div> -->								
+							</div>
+							<!-- <button type="button" data-toggle="collapse" data-target="#demo" class="btn btn-outline-info">More/Less</button> -->
+						</div>
+					</div>	
+				</li>
+			</ul>
+		</div>	
+	</div>
+	
+  
+	
 </div>
 
 </body>
@@ -66,34 +136,53 @@
 		
 		self.newTitle = ko.observable();
 		self.newDescription = ko.observable();
-				
-		self.clientSelected = ko.observable();		
+		self.newProductAreaId = ko.observable();
+		
+		self.clientIdSelected = ko.observable();		
+		self.productAreaIdSelected = ko.observable();		
 				
 		self.featureRequests = ko.observableArray([]);
+		self.clients = ko.observableArray([]);
+		self.productAreas = ko.observableArray([]);
 		
 		self.addFeatureRequest = function(data) {
 			self.featureRequests.push(new FeatureRequest(data));
+		};
+		
+		self.addClient = function(data) {
+			self.clients.push(new Client(data));
+		};
+		
+		self.addProductArea = function(data) {
+			self.productAreas.push(new ProductArea(data));
 		};
 		
 		self.addNewFeatureRequest = function() {
 			console.log("adding new");
 		};
 		
-		self.selectClient = function() {
-			console.log("selectClient " + this.clientSelected());
-			self.getClientFeatureRequests(this.clientSelected());
+		self.getClientFeatureRequests = function() {
+			self.getClientFeatureRequestsService(this.clientIdSelected(), this.productAreaIdSelected());
 		};
 		
-		self.getClientFeatureRequests = function(clientId) {
+		self.getClientFeatureRequestsService = function(clientId, productAreaId) {
 			self.featureRequests.removeAll();
-			urlString = "http://localhost:5000/feature-request/GET?clientId=" + clientId;
+			urlString = "http://localhost:5000/feature-request/GET?";
+			
+			if(clientId) {
+				urlString += "clientId=" + clientId + "&";
+			}
+			
+			if(productAreaId) {
+				urlString += "productAreaId=" + productAreaId;
+			}		
+			
 			$.ajax({
 				type: "GET",
 				contentType: "application/json; charset=utf-8",
 				dataType: "jsonp",
-				url: urlString,
+				url: encodeURI(urlString),
 				crossDomain: true,
-				jsonpCallback: "callback",
 				success: function(data) {
 					console.log("success " + data);
 					$.each(data, function(k, v) {
@@ -106,6 +195,62 @@
 			});			
 		};
 		
+		self.getClients = function(clientId) {
+			self.clients.removeAll();
+			urlString = "http://localhost:5000/client/GET";
+			
+			if(clientId) {
+				urlString += "?id=" + clientId;
+			}
+			
+			$.ajax({
+				type: "GET",
+				contentType: "application/json; charset=utf-8",
+				dataType: "jsonp",
+				url: encodeURI(urlString),
+				crossDomain: true,
+				success: function(data) {
+					console.log("success " + data);
+					$.each(data, function(k, v) {
+						self.addClient(v);
+						console.log(v);
+					});
+				},
+				error: function(data) {
+					console.log("error " + JSON.stringify(data));
+				}
+			});			
+		};		
+		
+		self.getProductAreas = function(productAreaId) {
+			self.productAreas.removeAll();
+			urlString = "http://localhost:5000/product-area/GET";
+			
+			if(productAreaId) {
+				urlString += "?id=" + productAreaId;
+			}
+			
+			$.ajax({
+				type: "GET",
+				contentType: "application/json; charset=utf-8",
+				dataType: "jsonp",
+				url: encodeURI(urlString),
+				crossDomain: true,
+				success: function(data) {
+					console.log("success " + data);
+					$.each(data, function(k, v) {
+						self.addProductArea(v);
+						console.log(v);
+					});
+				},
+				error: function(data) {
+					console.log("error " + JSON.stringify(data));
+				}
+			});			
+		};	
+		
+		self.getClients();
+		self.getProductAreas();
 	};
 
 	function FeatureRequest(data) {
@@ -116,6 +261,16 @@
 		this.priority = ko.observable(data.priority);
 		this.target = ko.observable(data.target);
 		this.productAreaId = ko.observable(data.product_area_id);
+	};
+	
+	function Client(data) {
+		this.id = ko.observable(data.id);
+		this.name = ko.observable(data.name);
+	};
+	
+	function ProductArea(data) {
+		this.id = ko.observable(data.id);
+		this.name = ko.observable(data.name);
 	};
 
 	ko.applyBindings(new FeatureRequestViewModel());

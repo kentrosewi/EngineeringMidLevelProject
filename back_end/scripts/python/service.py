@@ -10,12 +10,12 @@ app = config.app
 @app.route("/client/GET", methods=['GET'])
 def get_client():
 	clients = db_manager.get_client(request.args.get("id"))
-	return json.dumps(utility.dict_list(clients))
+	return request.args.get("callback") + "(" + json.dumps(utility.dict_list(clients)) + ")"
 
 @app.route("/product-area/GET", methods=['GET'])
 def get_product_area():
 	product_areas = db_manager.get_product_area(request.args.get("id"))
-	return json.dumps(utility.dict_list(product_areas))
+	return request.args.get("callback") + "(" + json.dumps(utility.dict_list(product_areas)) + ")"
 
 @app.route("/feature-request/GET", methods=['GET'])
 def get_feature_request():
@@ -26,7 +26,7 @@ def get_feature_request():
 	
 	feature_requests = db_manager.get_feature_request(feature_request_id_param, client_id_param, product_area_id_param, priority_param)
 	# return json.dumps(utility.dict_list(feature_requests), default = utility.convert)
-	return "callback(" + json.dumps(utility.dict_list(feature_requests), default = utility.convert) + ")"
+	return request.args.get("callback") + "(" + json.dumps(utility.dict_list(feature_requests), default = utility.convert) + ")"
 		
 		
 
