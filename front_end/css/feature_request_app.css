@@ -1,6 +1,7 @@
 .fr-display {
 	list-style-type: none;
 	text-align: left;
+	-webkit-padding-end: 40px;
 }
 
 .fr-li {
