@@ -1,7 +1,21 @@
-define(['knockout', 'text!./new-feature-request.html'], function(ko, htmlString) {
+define([
+	'knockout', 
+	'pubsub', 
+	'text!./new-feature-request.html', 
+	'../../services/feature-request-service', 
+	'../../services/client-service',
+	'../../services/product-area-service'
+	], function(
+		ko, 
+		pubsub, 
+		htmlString, 
+		FeatureRequestService, 
+		ClientService, 
+		ProductAreaService
+		) {
     function NewFeatureRequestViewModel(params) {
 		var self = this;		
-		
+
 		self.clients = ko.observableArray([]);
 		self.productAreas = ko.observableArray([]);
 		
@@ -11,6 +25,13 @@ define(['knockout', 'text!./new-feature-request.html'], function(ko, htmlString)
 		self.newProductAreaId = ko.observable();
 		self.newTargetDate = ko.observable();
 		self.newPriority = ko.observable();
+		self.submitNewFeatureRequestTopic = params.submitNewFeatureRequestTopic();
+		self.SUCCESS = "SUCCESS";
+		self.ERROR = "ERROR";
+		
+		self.featureRequestService = new FeatureRequestService();
+		self.clientService = new ClientService();
+		self.productAreaService = new ProductAreaService();
 		
 		self.setTargetDateBounds = function() {
 			var today = new Date();
@@ -25,12 +46,24 @@ define(['knockout', 'text!./new-feature-request.html'], function(ko, htmlString)
 			} 
 
 			today = yyyy + '-' + mm + '-' + dd;
-			document.getElementById("targetDateInput").setAttribute("min", today);
+			$('#targetDateInput').attr("min", today);
+
 			fiveYearsFromToday = (yyyy + 5) + '-' + mm + '-' + dd;
-			document.getElementById("targetDateInput").setAttribute("max", fiveYearsFromToday);
+			$('#targetDateInput').attr("max", fiveYearsFromToday);
 		}
 	
 		self.setTargetDateBounds();
+		
+		self.publishToSubmitNewFeatureRequestTopic = function(successful) {
+			var result = self.ERROR;
+			if(successful) {
+				result = self.SUCCESS;	
+			} 			
+			
+			if(self.submitNewFeatureRequestTopic) {
+				pubsub.publish(self.submitNewFeatureRequestTopic, result);				
+			}							
+		}
 		
 		self.submitNewFeatureRequest = function() {
 			newFeatureRequestModel = {
@@ -43,113 +76,41 @@ define(['knockout', 'text!./new-feature-request.html'], function(ko, htmlString)
 				"product_area_id": self.newProductAreaId()
 			}			
 			
-			self.submitNewFeatureRequestService(newFeatureRequestModel);
-		};
+			self.featureRequestService.submitNewFeatureRequest(
+				newFeatureRequestModel,
+				function() {
+					self.publishToSubmitNewFeatureRequestTopic(true);
+				},
+				function() {
+					self.publishToSubmitNewFeatureRequestTopic(true);
+				}
+			);
+		};		
 
-		self.submitNewFeatureRequestService = function(newFeatureRequest) {
-			urlString = "http://localhost:5000/feature-request/POST?";
-			
-			if(newFeatureRequest.title) {
-				urlString += "title=" + newFeatureRequest.title + "&";
+		self.clientService.getClients(
+			null, 
+			function(data) {
+				self.clients.removeAll();
+				$.each(data, function(k, v) {
+					self.clients.push(v);
+				});		
+			}, function(data) {
+				alertError();			
 			}
-			
-			if(newFeatureRequest.description) {
-				urlString += "description=" + newFeatureRequest.description + "&";
-			}
-			
-			if(newFeatureRequest.target) {
-				urlString += "target=" + newFeatureRequest.target + "&";
-			}
-			
-			if(newFeatureRequest.priority) {
-				urlString += "priority=" + newFeatureRequest.priority + "&";
-			}
-			
-			if(newFeatureRequest.client_id) {
-				urlString += "clientId=" + newFeatureRequest.client_id + "&";
-			}
-			
-			if(newFeatureRequest.product_area_id) {
-				urlString += "productAreaId=" + newFeatureRequest.product_area_id;
-			}		
-			
-			$.ajax({
-				type: "GET",
-				contentType: "application/json; charset=utf-8",
-				dataType: "jsonp",
-				url: encodeURI(urlString),
-				crossDomain: true,
-				success: function(data) {
-					console.log("submit fr success" + data);
-					document.getElementById("submitForm").reset();
-					// $('#submitBlock').collapse('toggle')
-					// alertSuccess();
-				},
-				error: function(data) {
-					console.log("submit fr error " + data);
-					// alertError();
-				}
-			});			
-		};		
+		);
 		
-		self.getClients = function(clientId) {
-			self.clients.removeAll();
-			urlString = "http://localhost:5000/client/GET";
-			
-			if(clientId) {
-				urlString += "?id=" + clientId;
+		self.productAreaService.getProductAreas(
+			null, 
+			function(data) {
+				self.productAreas.removeAll();
+				$.each(data, function(k, v) {
+					self.productAreas.push(v);
+				});		
+			}, function(data) {
+				alertError();			
 			}
-			
-			$.ajax({
-				type: "GET",
-				contentType: "application/json; charset=utf-8",
-				dataType: "jsonp",
-				url: encodeURI(urlString),
-				crossDomain: true,
-				success: function(data) {
-					$.each(data, function(k, v) {
-						self.clients.push(v);
-					});
-				},
-				error: function(data) {
-					alertError();
-				}
-			});			
-		};		
-		
-		self.getProductAreas = function(productAreaId) {
-			self.productAreas.removeAll();
-			urlString = "http://localhost:5000/product-area/GET";
-			
-			if(productAreaId) {
-				urlString += "?id=" + productAreaId;
-			}
-			
-			$.ajax({
-				type: "GET",
-				contentType: "application/json; charset=utf-8",
-				dataType: "jsonp",
-				url: encodeURI(urlString),
-				crossDomain: true,
-				success: function(data) {
-					$.each(data, function(k, v) {
-						self.productAreas.push(v);	
-						//self.productAreasMap.set(v.id, v.name);
-					});				
-				},
-				error: function(data) {
-					alertError();
-				}
-			});			
-		};	
-		
-		self.getClients();
-		self.getProductAreas();
+		);
     }
  
-    // Use prototype to declare any public methods
-    //NewFeatureRequestViewModel.prototype.doSomething = function() { ... };
-	//ko.applyBindings(new NewFeatureRequestViewModel());
-    // Return component definition
     return { viewModel: NewFeatureRequestViewModel, template: htmlString };
 });

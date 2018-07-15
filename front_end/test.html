@@ -59,7 +59,7 @@
 					</div>					
 				</div>
 				<div id="submitBlock" class="collapse">
-					<new-feature-request-component params=""></new-feature-request-component>
+					<new-feature-request-component id="newFeatureRequestComponent" params="submitNewFeatureRequestTopic: submitNewFeatureRequestTopic"></new-feature-request-component>
 				</div>
 			</div>
 		</div>
@@ -80,11 +80,10 @@
 								<p>Target: <span data-bind='text: target'></span>
 								<p>Product Area: <span data-bind='text: $parent.getProductAreaName(productAreaId())'></span>
 								<div> 
-									<button type="button" class="btn btn-outline-warning">Edit</button>
+									<!-- <button type="button" class="btn btn-outline-warning">Edit</button> -->
 									<button type="button" data-bind="click: $parent.deleteFeatureRequest" class="btn btn-outline-danger">Delete</button>	
 								</div>							
 							</div>
-							<button type="button" data-toggle="collapse" data-target="#demo" class="btn btn-outline-info">More/Less</button>
 						</div>
 					</div>	
 				</li>
@@ -106,205 +105,191 @@
 	</script>
 <script>
 require(['config'], function() {
-require(['knockout', 'jquery', 'bootstrap'], function(ko, $, bootstrap) {
-		
-	
-	var FeatureRequestViewModel = function() {
-		var self = this;
-		
-		self.clientIdSelected = ko.observable();		
-		self.productAreaIdSelected = ko.observable();		
+	require([
+		'knockout', 
+		'jquery', 
+		'bootstrap', 
+		'pubsub', 
+		'services/feature-request-service', 
+		'services/client-service', 
+		'services/product-area-service'
+		], function(
+			ko, 
+			$, 
+			bootstrap, 
+			pubsub, 
+			FeatureRequestService,
+			ClientService,
+			ProductAreaService
+			) {	
+		var FeatureRequestViewModel = function() {
+			var self = this;
+			
+			self.submitNewFeatureRequestTopic = ko.observable("SUBMIT_NEW_FEATURE_REQUEST_TOPIC");
+			self.clientIdSelected = ko.observable();		
+			self.productAreaIdSelected = ko.observable();		
+					
+			self.featureRequests = ko.observableArray([]);
+			self.clients = ko.observableArray([]);
+			self.productAreas = ko.observableArray([]);
+			self.productAreasMap = new Map();
+			
+			self.featureRequestService = new FeatureRequestService();
+			self.clientService = new ClientService();
+			self.productAreaService = new ProductAreaService();
+			
+			self.lastClientId = 0;
+			self.lastProductAreaId = 0;
+			
+			self.addFeatureRequest = function(data) {
+				self.featureRequests.push(new FeatureRequest(data));
+			};
+			
+			self.removeFeatureRequest = function(data) {
+				self.featureRequests.remove(data);
+			};
+			
+			self.addClient = function(data) {
+				self.clients.push(new Client(data));
+			};
+			
+			self.addProductArea = function(data) {
+				self.productAreas.push(new ProductArea(data));
+			};
+			
+			self.getProductAreaName = function(id) {
+				return self.productAreasMap.get(id);
+			}
+			
+			self.deleteFeatureRequest = function() {
+				var toDelete = this;
+				self.featureRequestService.deleteFeatureRequest(
+					toDelete.id(), // from feature request to delete
+					function(data) {
+						alertSuccess();
+						self.removeFeatureRequest(toDelete);				
+					},
+					function(data) {
+						alertError();
+					}
+				);
+			}
+			
+			self.getClientFeatureRequests = function() {
+				if(self.lastClientId !== this.clientIdSelected() || self.lastProductAreaId !== this.productAreaIdSelected()) {
+					self.lastClientId = this.clientIdSelected();
+					self.lastProductAreaId = this.productAreaIdSelected();
 				
-		self.featureRequests = ko.observableArray([]);
-		self.clients = ko.observableArray([]);
-		self.productAreas = ko.observableArray([]);
-		self.productAreasMap = new Map();
-		
-		self.lastClientId = 0;
-		self.lastProductAreaId = 0;
-		
-		self.addFeatureRequest = function(data) {
-			self.featureRequests.push(new FeatureRequest(data));
-		};
-		
-		self.removeFeatureRequest = function(data) {
-			self.featureRequests.remove(data);
-		};
-		
-		self.addClient = function(data) {
-			self.clients.push(new Client(data));
-		};
-		
-		self.addProductArea = function(data) {
-			self.productAreas.push(new ProductArea(data));
-		};
-		
-		self.getProductAreaName = function(id) {
-			return self.productAreasMap.get(id);
-		}
-		
-		self.deleteFeatureRequest = function() {
-			self.deleteFeatureRequestService(this);
-		}
-		
-		self.getClientFeatureRequests = function() {
-			if(self.lastClientId !== this.clientIdSelected() || self.lastProductAreaId !== this.productAreaIdSelected()) {
-				self.lastClientId = this.clientIdSelected();
-				self.lastProductAreaId = this.productAreaIdSelected();
-			
-				self.getClientFeatureRequestsService(this.clientIdSelected(), this.productAreaIdSelected());		
-			}
-		};
-		
-		self.getClientFeatureRequestsService = function(clientId, productAreaId) {
-			self.featureRequests.removeAll();
-			urlString = "http://localhost:5000/feature-request/GET?";
-			
-			if(clientId) {
-				urlString += "clientId=" + clientId + "&";
-			}
-			
-			if(productAreaId) {
-				urlString += "productAreaId=" + productAreaId;
-			}		
-			
-			$.ajax({
-				type: "GET",
-				contentType: "application/json; charset=utf-8",
-				dataType: "jsonp",
-				url: encodeURI(urlString),
-				crossDomain: true,
-				success: function(data) {
-					$.each(data, function(k, v) {
-						self.addFeatureRequest(v);
-					});
-				},
-				error: function(data) {
-					alertError();
+					self.featureRequestService.getClientFeatureRequests(
+						this.clientIdSelected(), 
+						this.productAreaIdSelected(),
+						self.getClientFeatureRequestsSuccess,
+						self.getClientFeatureRequestsError
+					);
 				}
-			});			
-		};
-		
-		self.deleteFeatureRequestService = function(featureRequest) {
-
-			urlString = "http://localhost:5000/feature-request/DELETE?";			
+			};
 			
-			if(featureRequest.id()) {
-				urlString += "id=" + featureRequest.id();
-			}		
+			self.getClientFeatureRequestsSuccess = function(data) {
+				self.featureRequests.removeAll();
+				$.each(data, function(k, v) {
+					self.addFeatureRequest(v);
+				});			
+			};
 			
-			$.ajax({
-				type: "GET",
-				contentType: "application/json; charset=utf-8",
-				dataType: "jsonp",
-				url: encodeURI(urlString),
-				crossDomain: true,
-				success: function(data) {
-					alertSuccess();
-					self.removeFeatureRequest(featureRequest);
-				},
-				error: function(data) {
-					alertError();
-				}
-			});			
-		};
-		
-		self.getClients = function(clientId) {
-			self.clients.removeAll();
-			urlString = "http://localhost:5000/client/GET";
+			self.getClientFeatureRequestsError = function(data) {
+				alertError();			
+			};
 			
-			if(clientId) {
-				urlString += "?id=" + clientId;
-			}
-			
-			$.ajax({
-				type: "GET",
-				contentType: "application/json; charset=utf-8",
-				dataType: "jsonp",
-				url: encodeURI(urlString),
-				crossDomain: true,
-				success: function(data) {
+			self.clientService.getClients(
+				null,
+				function(data) {
 					$.each(data, function(k, v) {
 						self.addClient(v);
-					});
+					});			
 				},
-				error: function(data) {
+				function(data) {
 					alertError();
 				}
-			});			
-		};		
-		
-		self.getProductAreas = function(productAreaId) {
-			self.productAreas.removeAll();
-			urlString = "http://localhost:5000/product-area/GET";
+			);
 			
-			if(productAreaId) {
-				urlString += "?id=" + productAreaId;
-			}
-			
-			$.ajax({
-				type: "GET",
-				contentType: "application/json; charset=utf-8",
-				dataType: "jsonp",
-				url: encodeURI(urlString),
-				crossDomain: true,
-				success: function(data) {
+			self.productAreaService.getProductAreas(
+				null,
+				function(data) {
 					$.each(data, function(k, v) {
 						self.addProductArea(v);		
 						self.productAreasMap.set(v.id, v.name);
 					});				
 				},
-				error: function(data) {
+				function(data) {
 					alertError();
 				}
-			});			
-		};	
+			);
+			
+			pubsub.subscribe(self.submitNewFeatureRequestTopic(), function(msg, data) {
+				if(data === "SUCCESS") {
+					self.submitNewFeatureRequestSuccess();
+				} else {
+					self.submitNewFeatureRequestError();
+				}
+			});
+			
+			self.submitNewFeatureRequestSuccess = function() {
+				$('#submitBlock').collapse('toggle')
+				alertSuccess();
+				self.featureRequestService.getClientFeatureRequests(
+					this.lastClientId, 
+					this.lastProductAreaId,
+					self.getClientFeatureRequestsSuccess,
+					self.getClientFeatureRequestsError
+				);
+			}
+			
+			self.submitNewFeatureRequestSError = function() {
+				alertError();
+			}
+		};
+
+		function FeatureRequest(data) {
+			this.id = ko.observable(data.id);
+			this.title = ko.observable(data.title);
+			this.description = ko.observable(data.description);
+			this.clientId = ko.observable(data.client_id);
+			this.priority = ko.observable(data.priority);
+			this.target = ko.observable(data.target);
+			this.productAreaId = ko.observable(data.product_area_id);
+		};
 		
-		self.getClients();
-		self.getProductAreas();
-	};
+		function Client(data) {
+			this.id = ko.observable(data.id);
+			this.name = ko.observable(data.name);
+		};
+		
+		function ProductArea(data) {
+			this.id = ko.observable(data.id);
+			this.name = ko.observable(data.name);
+		};
 
-	function FeatureRequest(data) {
-		this.id = ko.observable(data.id);
-		this.title = ko.observable(data.title);
-		this.description = ko.observable(data.description);
-		this.clientId = ko.observable(data.client_id);
-		this.priority = ko.observable(data.priority);
-		this.target = ko.observable(data.target);
-		this.productAreaId = ko.observable(data.product_area_id);
-	};
-	
-	function Client(data) {
-		this.id = ko.observable(data.id);
-		this.name = ko.observable(data.name);
-	};
-	
-	function ProductArea(data) {
-		this.id = ko.observable(data.id);
-		this.name = ko.observable(data.name);
-	};
-
-	ko.applyBindings(new FeatureRequestViewModel());
-	
-
-	
-	$(document).ready (function(){
-            $("#success-alert").hide();
-			$("#danger-alert").hide();
-	});
-	
-	function alertSuccess() {
-		$("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
-			$("#success-alert").slideUp(500);
-		});   	
-	}
-	
-	function alertError() {
-		$("#danger-alert").fadeTo(2000, 500).slideUp(500, function(){
-			$("#edanger-alert").slideUp(500);
-		});  
-	}
-	
-});	
+		ko.applyBindings(new FeatureRequestViewModel());
+		
+		$(document).ready (function(){
+				$("#success-alert").hide();
+				$("#danger-alert").hide();
+		});
+		
+		function alertSuccess() {
+			window.scrollTo(0,0);
+			$("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
+				$("#success-alert").slideUp(500);
+			});   	
+		}
+		
+		function alertError() {
+			window.scrollTo(0,0);
+			$("#danger-alert").fadeTo(2000, 500).slideUp(500, function(){
+				$("#edanger-alert").slideUp(500);
+			});  
+		}
+		
+	});	
 });
 </script>
