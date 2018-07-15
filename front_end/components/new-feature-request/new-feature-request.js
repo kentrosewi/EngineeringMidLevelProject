@@ -26,8 +26,7 @@ define([
 		self.newTargetDate = ko.observable();
 		self.newPriority = ko.observable();
 		self.submitNewFeatureRequestTopic = params.submitNewFeatureRequestTopic();
-		self.SUCCESS = "SUCCESS";
-		self.ERROR = "ERROR";
+		self.errorTopic = params.errorTopic();
 		
 		self.featureRequestService = new FeatureRequestService();
 		self.clientService = new ClientService();
@@ -54,15 +53,16 @@ define([
 	
 		self.setTargetDateBounds();
 		
-		self.publishToSubmitNewFeatureRequestTopic = function(successful) {
-			var result = self.ERROR;
+		self.publishToSubmitNewFeatureRequestTopic = function(successful, clientId, productAreaId) {
 			if(successful) {
-				result = self.SUCCESS;	
-			} 			
-			
-			if(self.submitNewFeatureRequestTopic) {
-				pubsub.publish(self.submitNewFeatureRequestTopic, result);				
-			}							
+				if(self.submitNewFeatureRequestTopic) {
+					pubsub.publish(self.submitNewFeatureRequestTopic, { status: "SUCCESS", clientId: clientId, productAreaId: productAreaId});
+				}					
+			} else {
+				if(self.errorTopic) {
+					pubsub.publish(self.errorTopic, "ERROR");
+				}			
+			}			
 		}
 		
 		self.submitNewFeatureRequest = function() {
@@ -80,14 +80,18 @@ define([
 				newFeatureRequestModel,
 				function() {
 					$('#submitForm').trigger("reset");
-					self.publishToSubmitNewFeatureRequestTopic(true);
+					self.publishToSubmitNewFeatureRequestTopic(true, self.newClientId(), self.newProductAreaId());
 				},
 				function() {
-					self.publishToSubmitNewFeatureRequestTopic(true);
+					self.publishToSubmitNewFeatureRequestTopic(false);
 				}
 			);
 		};		
 
+		self.alertError = function() {
+			pubsub.publish(self.errorTopic, "ERROR");
+		}
+		
 		self.clientService.getClients(
 			null, 
 			function(data) {
@@ -96,7 +100,7 @@ define([
 					self.clients.push(v);
 				});		
 			}, function(data) {
-				alertError();			
+				self.alertError();			
 			}
 		);
 		
@@ -108,7 +112,7 @@ define([
 					self.productAreas.push(v);
 				});		
 			}, function(data) {
-				alertError();			
+				self.alertError();			
 			}
 		);
     }

@@ -1,0 +1,20 @@
+.fr-display {
+	list-style-type: none;
+	text-align: left;
+}
+
+.fr-li {
+	display: inline-block;
+}
+
+.main-header {
+	text-align: center;
+}
+
+.w100p {
+	width: 100%;
+}
+
+.wrap-words {
+	white-space: normal;
+}

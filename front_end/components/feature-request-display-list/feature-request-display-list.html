@@ -1,0 +1,17 @@
+<div class="card-deck mb-3">
+	<ul data-bind="foreach: featureRequests" class="fr-display">			
+		<li class="fr-li">					
+			<feature-request-display-component params="
+				id: id, 
+				client_id: 
+				client_id, 
+				product_area_id: product_area_id, 
+				product_area_name: product_area_name,
+				title: title, 
+				description: description, 
+				target: target, 
+				priority: priority,
+				"></feature-request-display-component>
+		</li>
+	</ul>
+</div>	
