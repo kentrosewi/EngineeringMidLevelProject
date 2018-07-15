@@ -79,6 +79,7 @@ define([
 			self.featureRequestService.submitNewFeatureRequest(
 				newFeatureRequestModel,
 				function() {
+					$('#submitForm').trigger("reset");
 					self.publishToSubmitNewFeatureRequestTopic(true);
 				},
 				function() {

@@ -1,295 +1,301 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<title>Feature Request</title>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
-	<script data-main="config" src="require.js"></script>
-</head>
-<body> 
-<div class="alert alert-success" id="success-alert">
-    <strong>Success! </strong>
-    Your action has completed successfully.
-</div>
-<div class="alert alert-danger" id="danger-alert">
-    <strong>Error! </strong>
-    Please try again in a short while.
-</div>
+	<head>
+		<title>Feature Request</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css">
+		<script data-main="config" src="require.js"></script>
+	</head>
 
-<div class="container-fluid"> 
-	<div class="row mb-4">
-		<div class="col-md-12" style="text-align: center;">
-			<h1>Feature Request</h1>		
+	<body> 
+		<div class="alert alert-success" id="success-alert">
+			<strong>Success! </strong>
+			Your action has completed successfully.
 		</div>
-	</div>
-	
-	<form data-bind="submit: getClientFeatureRequests" class="mb-4">
-		<div class="row">
-			<div class="col-md-5 mb-2">
-				<select required class="form-control" data-bind="options: clients,
-																	optionsText: 'name',
-																	optionsValue: 'id',
-																	value: clientIdSelected,
-																	optionsCaption: 'Select a Client'">
-				</select>
-			</div>
-			<div class="col-md-5 mb-2">
-				<select class="form-control" data-bind="options: productAreas,
-																	optionsText: 'name',
-																	optionsValue: 'id',
-																	value: productAreaIdSelected,
-																	optionsCaption: 'Select a Product Area [Optional]'">
-				</select>
-			</div>
-			<div class="col-md-2 mb-2">
-				<button type="submit" class="btn btn-success" style="width: 100%">Go</button>
-			</div>		
+		<div class="alert alert-danger" id="danger-alert">
+			<strong>Error! </strong>
+			Please try again in a short while.
 		</div>
-	</form>
 
-	<div class="row mb-4">
-		<div class="col-md-6 offset-md-3">
-			<div class="card">
-				<div class="card-header">
-					<div class="row">
-						<div class="col-md-12">
-							<button type="button" style="width: 100%" class="btn btn-info" data-toggle="collapse" data-target="#submitBlock">Enter a new feature request</button>						
-						</div>
-					</div>					
-				</div>
-				<div id="submitBlock" class="collapse">
-					<new-feature-request-component id="newFeatureRequestComponent" params="submitNewFeatureRequestTopic: submitNewFeatureRequestTopic"></new-feature-request-component>
+		<div class="container-fluid"> 
+			<div class="row mb-4">
+				<div class="col-md-12" style="text-align: center;">
+					<h1>Feature Request</h1>		
 				</div>
 			</div>
-		</div>
-	</div>
-	<div class="row">
-		<div class="card-deck mb-3">
-			<ul data-bind="foreach: featureRequests" style="list-style-type: none; text-align: left">			
-				<!-- The existing feature requests. -->
-				<li style="display: inline-block">					
-					<div class="card mb-4 box-shadow">
+			
+			<form data-bind="submit: getClientFeatureRequests" class="mb-4">
+				<div class="row">
+					<div class="col-md-5 mb-2">
+						<select required class="form-control" data-bind="options: clients,
+																			optionsText: 'name',
+																			optionsValue: 'id',
+																			value: clientIdSelected,
+																			optionsCaption: 'Select a Client'">
+						</select>
+					</div>
+					<div class="col-md-5 mb-2">
+						<select class="form-control" data-bind="options: productAreas,
+																			optionsText: 'name',
+																			optionsValue: 'id',
+																			value: productAreaIdSelected,
+																			optionsCaption: 'Select a Product Area [Optional]'">
+						</select>
+					</div>
+					<div class="col-md-2 mb-2">
+						<button type="submit" class="btn btn-success" style="width: 100%">Go</button>
+					</div>		
+				</div>
+			</form>
+
+			<div class="row mb-4">
+				<div class="col-md-6 offset-md-3">
+					<div class="card">
 						<div class="card-header">
-							<h4 class="my-0 font-weight-normal"><span data-bind='text: title'></span></h4>
+							<div class="row">
+								<div class="col-md-12">
+									<button type="button" style="width: 100%" class="btn btn-info" data-toggle="collapse" data-target="#submitBlock">Enter a new feature request</button>						
+								</div>
+							</div>					
 						</div>
-						<div class="card-body">
-							<div>
-								<p>Description: <span data-bind='text: description'></span>
-								<p>Priority: <span data-bind='text: priority'></span>
-								<p>Target: <span data-bind='text: target'></span>
-								<p>Product Area: <span data-bind='text: $parent.getProductAreaName(productAreaId())'></span>
-								<div> 
-									<!-- <button type="button" class="btn btn-outline-warning">Edit</button> -->
-									<button type="button" data-bind="click: $parent.deleteFeatureRequest" class="btn btn-outline-danger">Delete</button>	
-								</div>							
-							</div>
+						<div id="submitBlock" class="collapse">
+							<new-feature-request-component id="newFeatureRequestComponent" params="submitNewFeatureRequestTopic: submitNewFeatureRequestTopic"></new-feature-request-component>
 						</div>
-					</div>	
-				</li>
-			</ul>
-		</div>	
-	</div>
-</div>
-
-</body>
+					</div>
+				</div>
+			</div>
+			
+			<div class="row">
+				<div class="card-deck mb-3">
+					<ul data-bind="foreach: featureRequests" style="list-style-type: none; text-align: left">			
+						<!-- The existing feature requests. -->
+						<li style="display: inline-block">					
+							<div class="card mb-4 box-shadow">
+								<div class="card-header">
+									<h4 class="my-0 font-weight-normal"><span data-bind='text: title'></span></h4>
+								</div>
+								<div class="card-body">
+									<div>
+										<p>Description: <span data-bind='text: description'></span>
+										<p>Priority: <span data-bind='text: priority'></span>
+										<p>Target: <span data-bind='text: target'></span>
+										<p>Product Area: <span data-bind='text: $parent.getProductAreaName(productAreaId())'></span>
+										<div> 
+											<!-- <button type="button" class="btn btn-outline-warning">Edit</button> -->
+											<button type="button" data-bind="click: $parent.deleteFeatureRequest" class="btn btn-outline-danger">Delete</button>	
+										</div>							
+									</div>
+								</div>
+							</div>	
+						</li>
+					</ul>
+				</div>	
+			</div>
+		</div>
+	</body>
 </html>
-	<script>
-		require(['config'], function() {
-			require(['knockout'], function(ko) {
-				ko.components.register('new-feature-request-component',{ 
-					require: 'components/new-feature-request/new-feature-request'
-				});		
-			});
-		});
-	</script>
+
 <script>
-require(['config'], function() {
-	require([
-		'knockout', 
-		'jquery', 
-		'bootstrap', 
-		'pubsub', 
-		'services/feature-request-service', 
-		'services/client-service', 
-		'services/product-area-service'
-		], function(
-			ko, 
-			$, 
-			bootstrap, 
-			pubsub, 
-			FeatureRequestService,
-			ClientService,
-			ProductAreaService
-			) {	
-		var FeatureRequestViewModel = function() {
-			var self = this;
-			
-			self.submitNewFeatureRequestTopic = ko.observable("SUBMIT_NEW_FEATURE_REQUEST_TOPIC");
-			self.clientIdSelected = ko.observable();		
-			self.productAreaIdSelected = ko.observable();		
+	require(['config'], function() {
+		require(['knockout'], function(ko) {
+			ko.components.register('new-feature-request-component',{ 
+				require: 'components/new-feature-request/new-feature-request'
+			});		
+			ko.components.register(feature-request-display-component',{ 
+				require: 'components/feature-request-display/feature-request-display'
+			});	
+		});
+	});
+</script>
+
+<script>
+	require(['config'], function() {
+		require([
+			'knockout', 
+			'jquery', 
+			'bootstrap', 
+			'pubsub', 
+			'services/feature-request-service', 
+			'services/client-service', 
+			'services/product-area-service'
+			], function(
+				ko, 
+				$, 
+				bootstrap, 
+				pubsub, 
+				FeatureRequestService,
+				ClientService,
+				ProductAreaService
+				) {	
+			var FeatureRequestViewModel = function() {
+				var self = this;
+				
+				self.submitNewFeatureRequestTopic = ko.observable("SUBMIT_NEW_FEATURE_REQUEST_TOPIC");
+				self.clientIdSelected = ko.observable();		
+				self.productAreaIdSelected = ko.observable();		
+						
+				self.featureRequests = ko.observableArray([]);
+				self.clients = ko.observableArray([]);
+				self.productAreas = ko.observableArray([]);
+				self.productAreasMap = new Map();
+				
+				self.featureRequestService = new FeatureRequestService();
+				self.clientService = new ClientService();
+				self.productAreaService = new ProductAreaService();
+				
+				self.lastClientId = 0;
+				self.lastProductAreaId = 0;
+				
+				self.addFeatureRequest = function(data) {
+					self.featureRequests.push(new FeatureRequest(data));
+				};
+				
+				self.removeFeatureRequest = function(data) {
+					self.featureRequests.remove(data);
+				};
+				
+				self.addClient = function(data) {
+					self.clients.push(new Client(data));
+				};
+				
+				self.addProductArea = function(data) {
+					self.productAreas.push(new ProductArea(data));
+				};
+				
+				self.getProductAreaName = function(id) {
+					return self.productAreasMap.get(id);
+				}
+				
+				self.deleteFeatureRequest = function() {
+					var toDelete = this;
+					self.featureRequestService.deleteFeatureRequest(
+						toDelete.id(), // from feature request to delete
+						function(data) {
+							alertSuccess();
+							self.removeFeatureRequest(toDelete);				
+						},
+						function(data) {
+							alertError();
+						}
+					);
+				}
+				
+				self.getClientFeatureRequests = function() {
+					if(self.lastClientId !== this.clientIdSelected() || self.lastProductAreaId !== this.productAreaIdSelected()) {
+						self.lastClientId = this.clientIdSelected();
+						self.lastProductAreaId = this.productAreaIdSelected();
 					
-			self.featureRequests = ko.observableArray([]);
-			self.clients = ko.observableArray([]);
-			self.productAreas = ko.observableArray([]);
-			self.productAreasMap = new Map();
-			
-			self.featureRequestService = new FeatureRequestService();
-			self.clientService = new ClientService();
-			self.productAreaService = new ProductAreaService();
-			
-			self.lastClientId = 0;
-			self.lastProductAreaId = 0;
-			
-			self.addFeatureRequest = function(data) {
-				self.featureRequests.push(new FeatureRequest(data));
-			};
-			
-			self.removeFeatureRequest = function(data) {
-				self.featureRequests.remove(data);
-			};
-			
-			self.addClient = function(data) {
-				self.clients.push(new Client(data));
-			};
-			
-			self.addProductArea = function(data) {
-				self.productAreas.push(new ProductArea(data));
-			};
-			
-			self.getProductAreaName = function(id) {
-				return self.productAreasMap.get(id);
-			}
-			
-			self.deleteFeatureRequest = function() {
-				var toDelete = this;
-				self.featureRequestService.deleteFeatureRequest(
-					toDelete.id(), // from feature request to delete
+						self.featureRequestService.getClientFeatureRequests(
+							this.clientIdSelected(), 
+							this.productAreaIdSelected(),
+							self.getClientFeatureRequestsSuccess,
+							self.getClientFeatureRequestsError
+						);
+					}
+				};
+				
+				self.getClientFeatureRequestsSuccess = function(data) {
+					self.featureRequests.removeAll();
+					$.each(data, function(k, v) {
+						self.addFeatureRequest(v);
+					});			
+				};
+				
+				self.getClientFeatureRequestsError = function(data) {
+					alertError();			
+				};
+				
+				self.clientService.getClients(
+					null,
 					function(data) {
-						alertSuccess();
-						self.removeFeatureRequest(toDelete);				
+						$.each(data, function(k, v) {
+							self.addClient(v);
+						});			
 					},
 					function(data) {
 						alertError();
 					}
 				);
-			}
-			
-			self.getClientFeatureRequests = function() {
-				if(self.lastClientId !== this.clientIdSelected() || self.lastProductAreaId !== this.productAreaIdSelected()) {
-					self.lastClientId = this.clientIdSelected();
-					self.lastProductAreaId = this.productAreaIdSelected();
 				
+				self.productAreaService.getProductAreas(
+					null,
+					function(data) {
+						$.each(data, function(k, v) {
+							self.addProductArea(v);		
+							self.productAreasMap.set(v.id, v.name);
+						});				
+					},
+					function(data) {
+						alertError();
+					}
+				);
+				
+				pubsub.subscribe(self.submitNewFeatureRequestTopic(), function(msg, data) {
+					if(data === "SUCCESS") {
+						self.submitNewFeatureRequestSuccess();
+					} else {
+						self.submitNewFeatureRequestError();
+					}
+				});
+				
+				self.submitNewFeatureRequestSuccess = function() {
+					$('#submitBlock').collapse('toggle')
+					alertSuccess();
 					self.featureRequestService.getClientFeatureRequests(
-						this.clientIdSelected(), 
-						this.productAreaIdSelected(),
+						this.lastClientId, 
+						this.lastProductAreaId,
 						self.getClientFeatureRequestsSuccess,
 						self.getClientFeatureRequestsError
 					);
 				}
-			};
-			
-			self.getClientFeatureRequestsSuccess = function(data) {
-				self.featureRequests.removeAll();
-				$.each(data, function(k, v) {
-					self.addFeatureRequest(v);
-				});			
-			};
-			
-			self.getClientFeatureRequestsError = function(data) {
-				alertError();			
-			};
-			
-			self.clientService.getClients(
-				null,
-				function(data) {
-					$.each(data, function(k, v) {
-						self.addClient(v);
-					});			
-				},
-				function(data) {
+				
+				self.submitNewFeatureRequestSError = function() {
 					alertError();
 				}
-			);
+			};
+
+			function FeatureRequest(data) {
+				this.id = ko.observable(data.id);
+				this.title = ko.observable(data.title);
+				this.description = ko.observable(data.description);
+				this.clientId = ko.observable(data.client_id);
+				this.priority = ko.observable(data.priority);
+				this.target = ko.observable(data.target);
+				this.productAreaId = ko.observable(data.product_area_id);
+			};
 			
-			self.productAreaService.getProductAreas(
-				null,
-				function(data) {
-					$.each(data, function(k, v) {
-						self.addProductArea(v);		
-						self.productAreasMap.set(v.id, v.name);
-					});				
-				},
-				function(data) {
-					alertError();
-				}
-			);
+			function Client(data) {
+				this.id = ko.observable(data.id);
+				this.name = ko.observable(data.name);
+			};
 			
-			pubsub.subscribe(self.submitNewFeatureRequestTopic(), function(msg, data) {
-				if(data === "SUCCESS") {
-					self.submitNewFeatureRequestSuccess();
-				} else {
-					self.submitNewFeatureRequestError();
-				}
+			function ProductArea(data) {
+				this.id = ko.observable(data.id);
+				this.name = ko.observable(data.name);
+			};
+
+			ko.applyBindings(new FeatureRequestViewModel());
+			
+			$(document).ready (function(){
+					$("#success-alert").hide();
+					$("#danger-alert").hide();
 			});
 			
-			self.submitNewFeatureRequestSuccess = function() {
-				$('#submitBlock').collapse('toggle')
-				alertSuccess();
-				self.featureRequestService.getClientFeatureRequests(
-					this.lastClientId, 
-					this.lastProductAreaId,
-					self.getClientFeatureRequestsSuccess,
-					self.getClientFeatureRequestsError
-				);
+			function alertSuccess() {
+				window.scrollTo(0,0);
+				$("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
+					$("#success-alert").slideUp(500);
+				});   	
 			}
 			
-			self.submitNewFeatureRequestSError = function() {
-				alertError();
+			function alertError() {
+				window.scrollTo(0,0);
+				$("#danger-alert").fadeTo(2000, 500).slideUp(500, function(){
+					$("#edanger-alert").slideUp(500);
+				});  
 			}
-		};
-
-		function FeatureRequest(data) {
-			this.id = ko.observable(data.id);
-			this.title = ko.observable(data.title);
-			this.description = ko.observable(data.description);
-			this.clientId = ko.observable(data.client_id);
-			this.priority = ko.observable(data.priority);
-			this.target = ko.observable(data.target);
-			this.productAreaId = ko.observable(data.product_area_id);
-		};
-		
-		function Client(data) {
-			this.id = ko.observable(data.id);
-			this.name = ko.observable(data.name);
-		};
-		
-		function ProductArea(data) {
-			this.id = ko.observable(data.id);
-			this.name = ko.observable(data.name);
-		};
-
-		ko.applyBindings(new FeatureRequestViewModel());
-		
-		$(document).ready (function(){
-				$("#success-alert").hide();
-				$("#danger-alert").hide();
-		});
-		
-		function alertSuccess() {
-			window.scrollTo(0,0);
-			$("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
-				$("#success-alert").slideUp(500);
-			});   	
-		}
-		
-		function alertError() {
-			window.scrollTo(0,0);
-			$("#danger-alert").fadeTo(2000, 500).slideUp(500, function(){
-				$("#edanger-alert").slideUp(500);
-			});  
-		}
-		
-	});	
-});
+			
+		});	
+	});
 </script>
