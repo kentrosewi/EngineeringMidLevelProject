@@ -4,7 +4,7 @@ define([], function() {
     }
  
 	ProductAreaService.prototype.getProductAreas = function(productAreaId, successCallback, errorCallback) {
-		urlString = "http://localhost:5000/product-area/GET";
+		urlString = "http://18.237.87.86:5000/product-area/GET";
 		
 		if(productAreaId) {
 			urlString += "?id=" + productAreaId;

@@ -47,6 +47,9 @@ define([
 			today = yyyy + '-' + mm + '-' + dd;
 			$('#targetDateInput').attr("min", today);
 
+			oneYearFromToday = (yyyy + 1) + '-' + mm + '-' + dd;
+			self.newTargetDate = oneYearFromToday;
+			
 			fiveYearsFromToday = (yyyy + 5) + '-' + mm + '-' + dd;
 			$('#targetDateInput').attr("max", fiveYearsFromToday);
 		}

@@ -4,7 +4,7 @@ define([], function() {
     }
 	
 	FeatureRequestService.prototype.getClientFeatureRequests = function(clientId, productAreaId, successCallback, errorCallback) {
-		urlString = "http://localhost:5000/feature-request/GET?";
+		urlString = "http://18.237.87.86:5000/feature-request/GET?";
 		
 		if(clientId) {
 			urlString += "clientId=" + clientId + "&";
@@ -34,8 +34,8 @@ define([], function() {
 	};
  
 	FeatureRequestService.prototype.submitNewFeatureRequest = function(newFeatureRequest, successCallback, errorCallback) {
-		urlString = "http://localhost:5000/feature-request/POST?";
-		
+		urlString = "http://18.237.87.86:5000/feature-request/POST?";
+		//urlString = "http://18.237.87.86:5000/feature-request/POST";
 		if(newFeatureRequest.title) {
 			urlString += "title=" + newFeatureRequest.title + "&";
 		}
@@ -62,9 +62,11 @@ define([], function() {
 		
 		$.ajax({
 			type: "GET",
-			contentType: "application/json; charset=utf-8",
-			dataType: "jsonp",
 			url: encodeURI(urlString),
+			//url: urlString,
+			contentType: "application/json; charset=utf-8",
+			//data: JSON.stringify(newFeatureRequest),
+			dataType: "jsonp",
 			crossDomain: true,
 			success: function(data) {
 				if(successCallback) {
@@ -81,7 +83,7 @@ define([], function() {
 	
 	FeatureRequestService.prototype.deleteFeatureRequest = function(featureRequestId, successCallback, errorCallback) {
 
-		urlString = "http://localhost:5000/feature-request/DELETE?";			
+		urlString = "http://18.237.87.86:5000/feature-request/DELETE?";			
 		
 		if(featureRequestId) {
 			urlString += "id=" + featureRequestId;

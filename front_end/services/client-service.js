@@ -4,7 +4,7 @@ define([], function() {
     }
  
 	ClientService.prototype.getClients = function(clientId, successCallback, errorCallback) {
-		urlString = "http://localhost:5000/client/GET";
+		urlString = "http://18.237.87.86:5000/client/GET";
 		
 		if(clientId) {
 			urlString += "?id=" + clientId;
