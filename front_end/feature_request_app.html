@@ -61,17 +61,22 @@
 							</div>					
 						</div>
 						<div id="submitBlock" class="collapse">
-							<new-feature-request-component id="newFeatureRequestComponent" params="submitNewFeatureRequestTopic: submitNewFeatureRequestTopic, errorTopic: errorTopic"></new-feature-request-component>
+							<new-feature-request-component id="newFeatureRequestComponent" params="submitNewFeatureRequestTopic: submitNewFeatureRequestTopic, errorTopic: errorTopic, loadingTopic: loadingTopic"></new-feature-request-component>
 						</div>
 					</div>
 				</div>
 			</div>
 			
 			<div class="row">
-				<feature-request-display-list-component id="featureRequestDisplayList" params="loadFeatureRequestDisplayListTopic: loadFeatureRequestDisplayListTopic, errorTopic: errorTopic"></feature-request-display-component>
+				<feature-request-display-list-component id="featureRequestDisplayList" params="loadFeatureRequestDisplayListTopic: loadFeatureRequestDisplayListTopic, errorTopic: errorTopic, loadingTopic: loadingTopic"></feature-request-display-component>
 			</div>
 		</div>
 	</body>
+	
+	<div id="loadingOverlay" style="display: none">
+		<div class="overlay"></div>
+		<div class="loader"></div>
+	</div>
 </html>
 
 <script>
@@ -116,12 +121,12 @@
 				
 				self.submitNewFeatureRequestTopic = ko.observable("SUBMIT_NEW_FEATURE_REQUEST_TOPIC");
 				self.loadFeatureRequestDisplayListTopic = ko.observable("LOAD_FEATURE_REQUEST_DISPLAY_LIST_TOPIC");
-				self.errorTopic= ko.observable("ERROR_TOPIC");
+				self.errorTopic = ko.observable("ERROR_TOPIC");
+				self.loadingTopic = ko.observable("LOADING_TOPIC");
 				
 				self.clientIdSelected = ko.observable();		
 				self.productAreaIdSelected = ko.observable();		
-						
-						
+												
 				self.clients = ko.observableArray([]);
 				self.productAreas = ko.observableArray([]);
 				
@@ -184,6 +189,14 @@
 					} 
 				});
 				
+				pubsub.subscribe(self.loadingTopic(), function(msg, data) {
+					if(data === true) {
+						displayLoading(true);
+					} else {
+						displayLoading(false);
+					}
+				});
+				
 				self.submitNewFeatureRequestSuccess = function(clientId, productAreaId) {
 					$('#submitBlock').collapse('toggle')
 					alertSuccess();
@@ -224,6 +237,13 @@
 				});  
 			}
 			
+			function displayLoading(shouldDisplay) {
+				if(shouldDisplay) {
+					$("#loadingOverlay").show();
+				} else {
+					$("#loadingOverlay").hide();
+				}
+			}
 		});		
 	});
 </script>

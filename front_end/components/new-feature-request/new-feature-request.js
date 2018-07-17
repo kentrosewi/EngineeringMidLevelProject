@@ -27,6 +27,7 @@ define([
 		self.newPriority = ko.observable();
 		self.submitNewFeatureRequestTopic = params.submitNewFeatureRequestTopic();
 		self.errorTopic = params.errorTopic();
+		self.loadingTopic = params.loadingTopic();
 		
 		self.featureRequestService = new FeatureRequestService();
 		self.clientService = new ClientService();
@@ -47,8 +48,7 @@ define([
 			today = yyyy + '-' + mm + '-' + dd;
 			$('#targetDateInput').attr("min", today);
 
-			oneYearFromToday = (yyyy + 1) + '-' + mm + '-' + dd;
-			self.newTargetDate = oneYearFromToday;
+			self.newTargetDate(today);
 			
 			fiveYearsFromToday = (yyyy + 5) + '-' + mm + '-' + dd;
 			$('#targetDateInput').attr("max", fiveYearsFromToday);
@@ -79,17 +79,30 @@ define([
 				"product_area_id": self.newProductAreaId()
 			}			
 			
+			pubsub.publish(self.loadingTopic, true);
+			
 			self.featureRequestService.submitNewFeatureRequest(
 				newFeatureRequestModel,
 				function() {
-					$('#submitForm').trigger("reset");
+					pubsub.publish(self.loadingTopic, false);
+					self.resetForm();
 					self.publishToSubmitNewFeatureRequestTopic(true, self.newClientId(), self.newProductAreaId());
 				},
 				function() {
+					pubsub.publish(self.loadingTopic, false);
 					self.publishToSubmitNewFeatureRequestTopic(false);
 				}
 			);
-		};		
+		};	
+
+		self.resetForm = function() {
+			self.newClientId(null);
+			self.newTitle(null);
+			self.newDescription(null);
+			self.newProductAreaId(null);
+			self.newPriority(null);
+			self.setTargetDateBounds();
+		}
 
 		self.alertError = function() {
 			pubsub.publish(self.errorTopic, "ERROR");

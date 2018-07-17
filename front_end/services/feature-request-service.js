@@ -60,6 +60,7 @@ define([], function() {
 			urlString += "productAreaId=" + newFeatureRequest.product_area_id;
 		}		
 		
+		// Should be a POST. Would have to update version of Python to make POST work.
 		$.ajax({
 			type: "GET",
 			url: encodeURI(urlString),
