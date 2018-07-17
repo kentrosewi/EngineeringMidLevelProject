@@ -84,9 +84,9 @@ define([
 			self.featureRequestService.submitNewFeatureRequest(
 				newFeatureRequestModel,
 				function() {
-					pubsub.publish(self.loadingTopic, false);
-					self.resetForm();
+					pubsub.publish(self.loadingTopic, false);					
 					self.publishToSubmitNewFeatureRequestTopic(true, self.newClientId(), self.newProductAreaId());
+					self.resetForm();
 				},
 				function() {
 					pubsub.publish(self.loadingTopic, false);
